@@ -1,1 +1,1 @@
-worker: wtrsdb.py
+worker: python wtrsdb.py

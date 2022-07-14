@@ -269,7 +269,7 @@ Points: {rank}
         webhook_top_players.execute(remove_embeds=True)
         
     if count == 1:
-        for top_int in range(1, count_players):
+        for top_int in range(1, count_players+1):
             a_bs = a_bs.find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling()
             name_bs = a_bs.find_next_sibling()
             rank_bs = name_bs.find_next_sibling()

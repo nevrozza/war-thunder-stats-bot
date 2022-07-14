@@ -17,7 +17,8 @@ sql = db.cursor()
 sort_of_players = {}
 sorted_players = {}
 
-BOT_TOKEN = os.environ.get('BOT_TOKEN')
+# BOT_TOKEN = os.environ.get('BOT_TOKEN')
+BOT_TOKEN = 'OTk2NDAxNTIyNDE2MDM3OTI4.Gk5Pcb.ciVrNhMjWj8hAe0xySRZ7MB22WA9kY9Hw63pVk'
 client = discord.Client()
 
 webhook_channel_players_2 = DiscordWebhook(url = os.environ.get('webhook_channel_players'))

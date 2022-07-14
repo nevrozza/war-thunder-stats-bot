@@ -1,12 +1,13 @@
 from selenium import webdriver
 from bs4 import BeautifulSoup
-import sqlite3
+import psycopg2
 from discord_webhook import DiscordEmbed, DiscordWebhook
 import requests
 import schedule
 import time
 import os
-db = sqlite3.connect('wtrsdb.db', check_same_thread=False)
+db_uri = 'postgres://vysyajmduuptrm:ec417099e83e35577b8c877f5dbdbb7d2ddafb0d09a7cfb2693298331211575b@ec2-63-32-248-14.eu-west-1.compute.amazonaws.com:5432/de53ggptr86e8'
+db = psycopg2.connect(db_uri, sslmode = 'require')
 sql = db.cursor()
 
 sort_of_players = {}

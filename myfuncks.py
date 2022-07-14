@@ -187,22 +187,7 @@ def parsing_of_players(count):
     count_players_bs = bs.find(class_ = 'squadrons-info__meta-item')
     count_players = int(str(count_players_bs.text).split('Количество игроков: ')[1].replace(' ', ""))
     a_bs = bs.find(class_="squadrons-members__grid-item")
-    for i in range(1, count_players+1):
-        a_bs = a_bs.find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling()
-        name_bs = a_bs.find_next_sibling()
-        rank_bs = name_bs.find_next_sibling()
-        
-        name = str(str(name_bs.text).strip())
-        rank = int(str(rank_bs.text).strip())
-        sort_of_players[name] = rank
-        
-    sorted_values = sorted(sort_of_players.values(), reverse=True)
-    for values in sorted_values:
-        for keys in sort_of_players:
-            if sort_of_players[keys] == values:
-                sorted_players[keys] = sort_of_players[keys]
     
-       
     
     a_bs = bs.find(class_="squadrons-members__grid-item")         
     if count == 20:
@@ -269,8 +254,18 @@ Points: {rank}
         webhook_top_players.execute(remove_embeds=True)
         
     if count == 1:
-        
+        a_bs = bs.find(class_="squadrons-members__grid-item") 
         for top_int in range(0, count_players):
+            a_bs = a_bs.find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling()
+            name_bs = a_bs.find_next_sibling()
+            rank_bs = name_bs.find_next_sibling()
+            
+            name = str(str(name_bs.text).strip())
+            rank = int(str(rank_bs.text).strip())
+             
+            
+                
+
             try:
                 sql.execute(f"SELECT points FROM players WHERE name = '{name}'")
                 rank_player_change = rank  - sql.fetchone()[0]

@@ -418,8 +418,8 @@ def time_checker():
 schedule.every(1).seconds.do(time_checker) 
 while True:
     
-    # if time.strftime('%H:%M:%S', time.gmtime()) == os.environ.get('time_start'):
-    #     while True:
+    if time.strftime('%H:%M:%S', time.gmtime()) == os.environ.get('time_start'):
+        while True:
     
             schedule.run_pending()
             time.sleep(30)

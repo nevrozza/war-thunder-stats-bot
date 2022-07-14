@@ -1,28 +1,40 @@
+from threading import Thread
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import psycopg2
 from discord_webhook import DiscordEmbed, DiscordWebhook
+import discord
 import requests
 import schedule
 import time
 import os
-db_uri = 'postgres://vysyajmduuptrm:ec417099e83e35577b8c877f5dbdbb7d2ddafb0d09a7cfb2693298331211575b@ec2-63-32-248-14.eu-west-1.compute.amazonaws.com:5432/de53ggptr86e8'
 
+discord_bot_set = 0
+db_uri = os.environ.get("DATABASE_URL")
+db = psycopg2.connect(db_uri, sslmode = 'require')
+sql = db.cursor()
 
 sort_of_players = {}
 sorted_players = {}
 
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+client = discord.Client()
 
-webhook_channel_players_2 = DiscordWebhook(url = os.environ['webhook_channel_players'])
-webhook_channel_players = DiscordWebhook(url = os.environ['webhook_channel_players'])
-
+webhook_channel_players_2 = DiscordWebhook(url = os.environ.get("webhook_squadrons"))
 
 ds_channel_players_2 = DiscordEmbed(title = 'Active players (2)', color = 'ff0000', url = 'https://warthunder.com/en/community/claninfo/Ukrainian%20Atamans')
-ds_channel_players = DiscordEmbed(title = 'Active players', color = 'ff0000', url = 'https://warthunder.com/en/community/claninfo/Ukrainian%20Atamans')
 
-def parsing_of_squadrons():
-    webhook_squadrons = DiscordWebhook(url = os.environ['webhook_squadrons'])
-    ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')
+
+def parsing_of_squadrons(naming):
+    if naming == 'start':
+        webhook_squadrons = DiscordWebhook(url = os.environ.get("webhook_squadrons"))
+        ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons(Initial)', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')
+    elif naming == 'last':
+        webhook_squadrons = DiscordWebhook(url = os.environ.get("webhook_squadrons"))
+        ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons(Ending)', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')    
+    elif naming == 'norm':
+        webhook_squadrons = DiscordWebhook(url = os.environ.get("webhook_squadrons"))
+        ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')
     ds_squadrons.set_timestamp()
     db = psycopg2.connect(db_uri, sslmode = 'require')
     sql = db.cursor()
@@ -38,7 +50,7 @@ def parsing_of_squadrons():
     options.add_argument("--headless")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
-    driver = webdriver.Chrome(executable_path='/app/.chromedriver/bin/chromedriver', options=options)
+    driver = webdriver.Chrome(executable_path='chromedriver', options=options)
     driver.get("https://warthunder.com/en/community/clansleaderboard/")
     lnks=driver.find_elements('tag name', "a")
     for lnk in lnks:
@@ -61,33 +73,50 @@ def parsing_of_squadrons():
             kd = float('{:.2f}'.format(kills/deaths))
             ###COMPARATION
             try:
-                sql.execute(f"SELECT rank FROM squadrons WHERE name = '{name}'")
+                if naming == 'last': sql.execute(f"SELECT rank FROM period_squadrons WHERE name = '{name}'")
+                else:    
+                    sql.execute(f"SELECT rank FROM squadrons WHERE name = '{name}'")
                 top_change = int(top_int)  - sql.fetchone()[0]
-                sql.execute(f"SELECT points FROM squadrons WHERE name = '{name}'")
+                if naming == 'last': sql.execute(f"SELECT points FROM period_squadrons WHERE name = '{name}'")
+                else:
+                    sql.execute(f"SELECT points FROM squadrons WHERE name = '{name}'")
                 rank_change = rank  - sql.fetchone()[0]
-                sql.execute(f"SELECT kills FROM squadrons WHERE name = '{name}'")
+                if naming == 'last': sql.execute(f"SELECT kills FROM period_squadrons WHERE name = '{name}'")
+                else:
+                    sql.execute(f"SELECT kills FROM squadrons WHERE name = '{name}'")
                 old_kills = sql.fetchone()[0]
                 kills_change = kills  - old_kills
-                sql.execute(f"SELECT deaths FROM squadrons WHERE name = '{name}'")
+                if naming == 'last': sql.execute(f"SELECT deaths FROM period_squadrons WHERE name = '{name}'")
+                else:
+                    sql.execute(f"SELECT deaths FROM squadrons WHERE name = '{name}'")
                 old_deaths = sql.fetchone()[0]
                 deaths_change = deaths  - old_deaths
                 kd_change = float('{:.2f}'.format(kd - float('{:.2f}'.format(old_kills/old_deaths))))
-                
-                sql.execute(f"SELECT players FROM squadrons WHERE name = '{name}'")
+                if naming == 'last': sql.execute(f"SELECT players FROM period_squadrons WHERE name = '{name}'")
+                else:
+                    sql.execute(f"SELECT players FROM squadrons WHERE name = '{name}'")
                 count_players_change = count_players - sql.fetchone()[0]           
             except: None
             
             ###NEW
-            try:    
-                sql.execute(f"DELETE FROM squadrons WHERE name = '{name}'")
-                db.commit()
+            try:
+                if naming == 'start':
+                    sql.execute(f"DELETE FROM period_squadrons WHERE name = '{name}'")
+                    db.commit()
+                else:
+                    sql.execute(f"DELETE FROM squadrons WHERE name = '{name}'")
+                    db.commit()
                 
             except Exception as ex: 
                 print(ex)
                 sql.execute('ROLLBACK')
-                db.commit 
-            sql.execute("INSERT INTO squadrons(name, rank, points, kills, deaths, players) VALUES(%s, %s, %s, %s, %s, %s)", (name, top_int, rank, kills, deaths, count_players))
-            db.commit() 
+                db.commit
+            if naming == 'start':
+                sql.execute("INSERT INTO period_squadrons(name, rank, points, kills, deaths, players) VALUES(%s, %s, %s, %s, %s, %s)", (name, top_int, rank, kills, deaths, count_players))
+                db.commit() 
+            else:
+                sql.execute("INSERT INTO squadrons(name, rank, points, kills, deaths, players) VALUES(%s, %s, %s, %s, %s, %s)", (name, top_int, rank, kills, deaths, count_players))
+                db.commit() 
             
             
             print(f"""
@@ -153,7 +182,13 @@ Players: {count_players}
     driver.quit()
     webhook_squadrons.add_embed(ds_squadrons)
     webhook_squadrons.execute(remove_embeds=True)
-def parsing_of_players():
+def parsing_of_players(count):
+    webhook_channel_players = DiscordWebhook(url = os.environ.get("webhook_channel_players"))
+    webhook_top_players = DiscordWebhook(url = os.environ.get("webhook_channel_players"))
+    ds_channel_players = DiscordEmbed(title = 'Active players', color = 'ff0000', url = 'https://warthunder.com/en/community/claninfo/Ukrainian%20Atamans')
+    ds_channel_players.set_timestamp()
+    ds_top_players = DiscordEmbed(title = 'TOP 20', color = 'ff0000', url = 'https://warthunder.com/en/community/claninfo/Ukrainian%20Atamans')
+    ds_top_players.set_timestamp()
     db = psycopg2.connect(db_uri, sslmode = 'require')
     sql = db.cursor()
     discord_players = 0
@@ -182,76 +217,205 @@ def parsing_of_players():
        
     
     a_bs = bs.find(class_="squadrons-members__grid-item")         
-    for top_int in range(1, count_players):
-        a_bs = a_bs.find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling()
-        name_bs = a_bs.find_next_sibling()
-        rank_bs = name_bs.find_next_sibling()
-        
-        name = str(str(name_bs.text).strip())
-        rank = int(str(rank_bs.text).strip())
-        a_bs = bs.find(class_="squadrons-members__grid-item")  
-        while list(sorted_players.keys())[top_int] != name:
+    if count == 20:
+        for top_int in range(1, 21):
             a_bs = a_bs.find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling()
             name_bs = a_bs.find_next_sibling()
             rank_bs = name_bs.find_next_sibling()
+            
             name = str(str(name_bs.text).strip())
             rank = int(str(rank_bs.text).strip())
+            a_bs = bs.find(class_="squadrons-members__grid-item")  
+            while list(sorted_players.keys())[top_int] != name:
+                a_bs = a_bs.find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling()
+                name_bs = a_bs.find_next_sibling()
+                rank_bs = name_bs.find_next_sibling()
+                name = str(str(name_bs.text).strip())
+                rank = int(str(rank_bs.text).strip())
 
-        try:
-            sql.execute(f"SELECT rank FROM players WHERE name = '{name}'")
-            top_player_change = int(top_int)  - sql.fetchone()[0]
-            sql.execute(f"SELECT points FROM players WHERE name = '{name}'")
-            rank_player_change = rank  - sql.fetchone()[0]
-        except: None
-            
-        try:
-            sql.execute(f'DELETE FROM players WHERE name = "{name}" ')
-            db.commit()
+            try:
+                sql.execute(f"SELECT rank FROM top_players WHERE name = '{name}'")
+                top_player_change = int(top_int)  - sql.fetchone()[0]
+                sql.execute(f"SELECT points FROM top_players WHERE name = '{name}'")
+                rank_player_change = rank  - sql.fetchone()[0]
+            except: None
                 
-        except: None
-        sql.execute("INSERT INTO players VALUES(?, ?, ?)", (name, top_int, rank))
-        db.commit()
-        if top_player_change == 0:
-            top_int = top_int
-        elif top_player_change > 0:
-            name = f'{name} 🔻(-{top_player_change})' 
-        elif top_player_change < 0:
-            name = f'{name} <:small_green_triangle:996827805725753374>(+{abs(top_player_change)})'
-        if rank_player_change == 0:
-            pass
-        elif rank_player_change > 0:
-            discord_players +=1
-            if discord_players >= 25:
-                ds_channel_players_2.add_embed_field(name = f'#{top_int} {name}', value = f'**Points**: {rank} (+{rank_player_change})')
-            else:    
-                ds_channel_players.add_embed_field(name = f'#{top_int} {name}', value = f'**Points**: {rank} (+{rank_player_change})')
+            try:
+                sql.execute(f"DELETE FROM top_players WHERE name = '{name}'")
+                db.commit()
+                    
+            except Exception as ex: 
+                print(ex)
+                sql.execute('ROLLBACK')
+                db.commit 
+            sql.execute("INSERT INTO top_players(name, rank, points) VALUES(%s, %s, %s)", (name, top_int, rank))
+            db.commit()
+            if top_player_change == 0:
+                top_int = top_int
+            elif top_player_change > 0:
+                name = f'{name} 🔻(-{top_player_change})' 
+            elif top_player_change < 0:
+                name = f'{name} <:small_green_triangle:996827805725753374>(+{abs(top_player_change)})'
+            if rank_player_change == 0:
+                rank = rank
+            elif rank_player_change > 0:
+                rank = f'rank <:small_green_triangle:996827805725753374>(+{rank_player_change})'
+                
+            elif rank_player_change < 0:
+                rank = f'rank 🔻({rank_player_change})'
+
+
+            ds_top_players.add_embed_field(name = f'#{top_int} {name}', value = f'**Points**: {rank}')
+                
             
-        elif rank_player_change < 0:
-            discord_players +=1
-            if discord_players >= 25:
-                ds_channel_players_2.add_embed_field(name = f'#{top_int} {name}', value = f'**Points**: {rank} ({rank_player_change})')
-            else:
-                ds_channel_players.add_embed_field(name = f'#{top_int} {name}', value = f'**Points**: {rank} ({rank_player_change})')
+                
             
-        
-            
-        
-        print(f"""
+            print(f"""
 # {top_int}
 Name: {name}
 Points: {rank}
 """)
 
-    if discord_players >= 1:
-        webhook_channel_players.add_embed(ds_channel_players)
-        webhook_channel_players.execute(remove_embeds=True)
-    if discord_players >= 25:
-        webhook_channel_players_2.add_embed(ds_channel_players_2)
-        webhook_channel_players_2.execute(remove_embeds=True)
-    
-parsing_of_squadrons()
-schedule.every(60).seconds.do(parsing_of_squadrons)    
+        
+        webhook_top_players.add_embed(ds_top_players)
+        webhook_top_players.execute(remove_embeds=True)
+        
+    if count == 1:
+        for top_int in range(1, count_players):
+            a_bs = a_bs.find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling()
+            name_bs = a_bs.find_next_sibling()
+            rank_bs = name_bs.find_next_sibling()
+            
+            name = str(str(name_bs.text).strip())
+            rank = int(str(rank_bs.text).strip())
+            a_bs = bs.find(class_="squadrons-members__grid-item")  
+            while list(sorted_players.keys())[top_int] != name:
+                a_bs = a_bs.find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling()
+                name_bs = a_bs.find_next_sibling()
+                rank_bs = name_bs.find_next_sibling()
+                name = str(str(name_bs.text).strip())
+                rank = int(str(rank_bs.text).strip())
 
+            try:
+                sql.execute(f"SELECT rank FROM players WHERE name = '{name}'")
+                top_player_change = int(top_int)  - sql.fetchone()[0]
+                sql.execute(f"SELECT points FROM players WHERE name = '{name}'")
+                rank_player_change = rank  - sql.fetchone()[0]
+            except: None
+                
+            try:
+                sql.execute(f"DELETE FROM players WHERE name = '{name}'")
+                db.commit()
+                    
+            except Exception as ex: 
+                print(ex)
+                sql.execute('ROLLBACK')
+                db.commit 
+            sql.execute("INSERT INTO players(name, rank, points) VALUES(%s, %s, %s)", (name, top_int, rank))
+            db.commit()
+            if top_player_change == 0:
+                top_int = top_int
+            elif top_player_change > 0:
+                name = f'{name} 🔻(-{top_player_change})' 
+            elif top_player_change < 0:
+                name = f'{name} <:small_green_triangle:996827805725753374>(+{abs(top_player_change)})'
+            if rank_player_change == 0:
+                pass
+            elif rank_player_change > 0:
+                
+                discord_players +=1
+                if discord_players >= 25:
+                    
+                    ds_channel_players_2.add_embed_field(name = f'#{top_int} {name}', value = f'**Points**: {rank} <:small_green_triangle:996827805725753374>(+{rank_player_change})')
+                else:   
+                    
+                    ds_channel_players.add_embed_field(name = f'#{top_int} {name}', value = f'**Points**: {rank} <:small_green_triangle:996827805725753374>(+{rank_player_change})')
+                
+            elif rank_player_change < 0:
+                
+                discord_players +=1
+                if discord_players >= 25:
+                    
+                    ds_channel_players_2.add_embed_field(name = f'#{top_int} {name}', value = f'**Points**: {rank} 🔻({rank_player_change})')
+                else:
+                    
+                    ds_channel_players.add_embed_field(name = f'#{top_int} {name}', value = f'**Points**: {rank} 🔻({rank_player_change})')
+                
+            
+                
+            
+            print(f"""
+# {top_int}
+Name: {name}
+Points: {rank}
+""")
+
+        if discord_players >= 1:
+            webhook_channel_players.add_embed(ds_channel_players)
+            webhook_channel_players.execute(remove_embeds=True)
+        if discord_players >= 25:
+            webhook_channel_players_2.add_embed(ds_channel_players_2)
+            webhook_channel_players_2.execute(remove_embeds=True)        
+
+
+ 
+def func_parsing_of_top_players_ts():
+    parsing_of_top_players_ts = Thread(target=parsing_of_players, args=[20])
+    parsing_of_top_players_ts.start()  
+def func_parsing_of_players_ts():
+    parsing_of_top_players_ts = Thread(target=parsing_of_players, args=[1])
+    parsing_of_top_players_ts.start()  
+def func_parsing_of_squadrons_ts_last():
+    parsing_of_squadrons_ts = Thread(target = parsing_of_squadrons, args = 'last') 
+    parsing_of_squadrons_ts.start()
+def func_parsing_of_squadrons_ts_start():
+    parsing_of_squadrons_ts = Thread(target = parsing_of_squadrons, args=['start']) 
+    parsing_of_squadrons_ts.start()    
+def func_parsing_of_squadrons_ts_in_period():
+    parsing_of_squadrons_ts = Thread(target = parsing_of_squadrons, args=['norm']) 
+    parsing_of_squadrons_ts.start()
+
+def discord_bot():
+    @client.event
+    async def on_message(message):
+        if message.author == client.user:
+            return
+        # if message.channel.name == 'управление':
+        # if "<Role id=997106365413720104 name='123'>" in str(message.author.roles):
+        #     if message.content.lower() == '!top':
+        #         await message.channel.send(f'{message.author.mention} wait for top 20 players')
+        #         print(message.author.roles)
+        #         func_parsing_of_top_players_ts()
+        #         return
+        #     if message.content.lower() == '!topsq':
+        #         await message.channel.send(f'{message.author.mention} wait for top 20 squadrons')
+        #         func_parsing_of_squadrons_ts_in_period()
+        #         return
+        
+    client.run(BOT_TOKEN)
+
+def func_discord_bot_ts():
+    discord_bot_ts = Thread(target = discord_bot) 
+    discord_bot_ts.start()
+
+def time_checker():
+    global discord_bot_set
+    if discord_bot_set == 0:
+        func_discord_bot_ts()
+        discord_bot_set += 1
+    func_parsing_of_players_ts()
+    print(str(str(int(time.strftime('%H', time.gmtime())) * 60 + (int(time.strftime('%M', time.gmtime()))))+ str('+'+time.strftime('%S', time.gmtime()))))
+    if str(str(int(time.strftime('%H', time.gmtime())) * 60 + (int(time.strftime('%M', time.gmtime()))))+ str('+'+time.strftime('%S', time.gmtime()))) in ['50+0', '80+0', '110+0', '140+0', '170+0', '200+0', '230+0', '260+0', '290+0', '320+0', '350+0', '380+0', '410+0', '830+0', '860+0', '890+0', '920+0', '950+0', '980+0', '1010+0', '1040+0', '1070+0', '1100+0', '1130+0', '1160+0', '1190+0', '1220+0', '1250+0']:
+        func_parsing_of_squadrons_ts_in_period()
+    elif str(str(int(time.strftime('%H', time.gmtime())) * 60 + (int(time.strftime('%M', time.gmtime()))))+ str('+'+time.strftime('%S', time.gmtime()))) in ['830+0',  '1310+0']:
+        func_parsing_of_squadrons_ts_start()
+    elif str(str(int(time.strftime('%H', time.gmtime())) * 60 + (int(time.strftime('%M', time.gmtime()))))+ str('+'+time.strftime('%S', time.gmtime()))) in ['440+0', '1340+0']:
+        func_parsing_of_squadrons_ts_last()   
+schedule.every(1).seconds.do(time_checker) 
 while True:
-    schedule.run_pending()
-    time.sleep(1)   
+    
+    if time.strftime('%H:%M:%S', time.gmtime()) == os.environ.get('time_start'):
+        while True:
+    
+            schedule.run_pending()
+            time.sleep(30)  

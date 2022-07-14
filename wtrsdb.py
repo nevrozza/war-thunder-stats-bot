@@ -3,36 +3,32 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 import psycopg2
 from discord_webhook import DiscordEmbed, DiscordWebhook
-# import discord
+
 import requests
 import schedule
 import time
 import os
 
-# discord_bot_set = 0
-db_uri = 'postgres://vysyajmduuptrm:ec417099e83e35577b8c877f5dbdbb7d2ddafb0d09a7cfb2693298331211575b@ec2-63-32-248-14.eu-west-1.compute.amazonaws.com:5432/de53ggptr86e8'
+
+db_uri = os.environ.get('DATABASE_URL')
 
 
 sort_of_players = {}
 sorted_players = {}
 
-# BOT_TOKEN = 'OTk2NDAxNTIyNDE2MDM3OTI4.Gk5Pcb.ciVrNhMjWj8hAe0xySRZ7MB22WA9kY9Hw63pVk'
-# client = discord.Client()
 
-webhook_channel_players_2 = DiscordWebhook(url = "https://discord.com/api/webhooks/996836558017663056/D7jAbmNioxVoaXDo2R3215d3zNCYqi_CktkcIcs_vdhejOL0M8eCmsdD92WNa-NZmsp5")
 
-ds_channel_players_2 = DiscordEmbed(title = 'Active players (2)', color = 'ff0000', url = 'https://warthunder.com/en/community/claninfo/Ukrainian%20Atamans')
 
 
 def parsing_of_squadrons(naming):
     if naming == 'start':
-        webhook_squadrons = DiscordWebhook(url = "https://discord.com/api/webhooks/996836558017663056/D7jAbmNioxVoaXDo2R3215d3zNCYqi_CktkcIcs_vdhejOL0M8eCmsdD92WNa-NZmsp5")
+        webhook_squadrons = DiscordWebhook(url = os.environ.get('webhook_squadrons_old'))
         ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons(Initial)', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')
     elif naming == 'last':
-        webhook_squadrons = DiscordWebhook(url = "https://discord.com/api/webhooks/996836558017663056/D7jAbmNioxVoaXDo2R3215d3zNCYqi_CktkcIcs_vdhejOL0M8eCmsdD92WNa-NZmsp5")
+        webhook_squadrons = DiscordWebhook(url = os.environ.get('webhook_squadrons_old'))
         ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons(Ending)', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')    
     elif naming == 'norm':
-        webhook_squadrons = DiscordWebhook(url = "https://discord.com/api/webhooks/997040903761973288/nH5Sc8mYtonPXMsChH5nyh6Qf-f8cgv6ToVivfx8Y6CSh5VqbpxT0VtKYpV9SesU8olW")
+        webhook_squadrons = DiscordWebhook(url = os.environ.get('webhook_squadrons'))
         ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')
     ds_squadrons.set_timestamp()
     db = psycopg2.connect(db_uri, sslmode = 'require')
@@ -45,6 +41,7 @@ def parsing_of_squadrons(naming):
     count_players_change = 0
     top_int = 0
     options = webdriver.ChromeOptions()
+    options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
     options.add_argument("--headless")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
@@ -181,8 +178,10 @@ Players: {count_players}
     webhook_squadrons.add_embed(ds_squadrons)
     webhook_squadrons.execute(remove_embeds=True)
 def parsing_of_players(count):
-    webhook_channel_players = DiscordWebhook(url = "https://discord.com/api/webhooks/996836558017663056/D7jAbmNioxVoaXDo2R3215d3zNCYqi_CktkcIcs_vdhejOL0M8eCmsdD92WNa-NZmsp5")
-    webhook_top_players = DiscordWebhook(url = "https://discord.com/api/webhooks/996836558017663056/D7jAbmNioxVoaXDo2R3215d3zNCYqi_CktkcIcs_vdhejOL0M8eCmsdD92WNa-NZmsp5")
+    webhook_channel_players = DiscordWebhook(url = os.environ.get('webhook_channel_players'))
+    webhook_top_players = DiscordWebhook(url = os.environ.get('webhook_channel_players'))
+    webhook_channel_players_2 = DiscordWebhook(url = os.environ.get('webhook_channel_players'))
+    ds_channel_players_2 = DiscordEmbed(title = 'Active players', color = 'ff0000', url = 'https://warthunder.com/en/community/claninfo/Ukrainian%20Atamans')
     ds_channel_players = DiscordEmbed(title = 'Active players', color = 'ff0000', url = 'https://warthunder.com/en/community/claninfo/Ukrainian%20Atamans')
     ds_channel_players.set_timestamp()
     ds_top_players = DiscordEmbed(title = 'TOP 20', color = 'ff0000', url = 'https://warthunder.com/en/community/claninfo/Ukrainian%20Atamans')
@@ -373,38 +372,9 @@ def func_parsing_of_squadrons_ts_in_period():
     parsing_of_squadrons_ts = Thread(target = parsing_of_squadrons, args=['norm']) 
     parsing_of_squadrons_ts.start()
 
-# def discord_bot():
-#     @client.event
-#     async def on_message(message):
-#         if message.author == client.user:
-#             return
-#         if message.channel.name == 'управление':
-#             if "<Role id=997106365413720104 name='123'>" in str(message.author.roles):
-#                 if message.content.lower() == '!top':
-#                     await message.delete()
-#                     await message.channel.send(f'{message.author.mention} wait for top 20 players in <#996836535645241354>')
-#                     print(message.author.roles)
-#                     func_parsing_of_top_players_ts()
-#                     return
-#                 if message.content.lower() == '!topsq':
-#                     await message.delete()
-#                     await message.channel.send(f'{message.author.mention} wait for top 20 squadrons in <#997040874141782046>')
-#                     func_parsing_of_squadrons_ts_in_period()
-#                     return
-#             if message.content.lower() == '!check':
-#                 await message.delete()
-#                 await message.channel.send(f'{message.author.mention}: {message.author.roles}')
-#     client.run(BOT_TOKEN)
-
-# def func_discord_bot_ts():
-#     discord_bot_ts = Thread(target = discord_bot) 
-#     discord_bot_ts.start()
 
 def time_checker():
-    # global discord_bot_set
-    # if discord_bot_set == 0:
-    #     func_discord_bot_ts()
-    #     discord_bot_set += 1
+
     func_parsing_of_players_ts()
     print(str(str(int(time.strftime('%H', time.gmtime())) * 60 + (int(time.strftime('%M', time.gmtime()))))+ str('+'+time.strftime('%S', time.gmtime()))))
     if str(str(int(time.strftime('%H', time.gmtime())) * 60 + (int(time.strftime('%M', time.gmtime()))))+ str('+'+time.strftime('%S', time.gmtime()))) in ['80+0', '110+0', '140+0', '170+0', '200+0', '230+0', '260+0', '290+0', '320+0', '350+0', '380+0', '410+0', '860+0', '890+0', '920+0', '950+0', '980+0', '1010+0', '1040+0', '1070+0', '1100+0', '1130+0', '1160+0', '1190+0', '1220+0', '1250+0', '1280+0']:
@@ -416,7 +386,7 @@ def time_checker():
 schedule.every(30).seconds.do(time_checker) 
 while True:
     
-    if time.strftime('%H:%M:%S', time.gmtime()) == '14:55:00':
+    if time.strftime('%H:%M:%S', time.gmtime()) == os.environ.get('time_start'):
         while True:
     
             schedule.run_pending()

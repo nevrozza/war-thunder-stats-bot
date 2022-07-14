@@ -1,23 +1,22 @@
 from threading import Thread
 from selenium import webdriver
 from bs4 import BeautifulSoup
+import os
 import psycopg2
 from discord_webhook import DiscordEmbed, DiscordWebhook
-# import discord
+
 import requests
 import discord
 sort_of_players = {}
 sorted_players = {}
-db_uri = 'postgres://vysyajmduuptrm:ec417099e83e35577b8c877f5dbdbb7d2ddafb0d09a7cfb2693298331211575b@ec2-63-32-248-14.eu-west-1.compute.amazonaws.com:5432/de53ggptr86e8'
+
+db_uri = os.environ.get('DATABASE_URL')
 db = psycopg2.connect(db_uri, sslmode = 'require')
 sql = db.cursor()
-BOT_TOKEN = 'OTk2NDAxNTIyNDE2MDM3OTI4.Gk5Pcb.ciVrNhMjWj8hAe0xySRZ7MB22WA9kY9Hw63pVk'
+BOT_TOKEN = os.environ.get('BOT_TOKEN')
 client = discord.Client()
 def players():
-                webhook_channel_players = DiscordWebhook(url = "https://discord.com/api/webhooks/996836558017663056/D7jAbmNioxVoaXDo2R3215d3zNCYqi_CktkcIcs_vdhejOL0M8eCmsdD92WNa-NZmsp5")
-                webhook_top_players = DiscordWebhook(url = "https://discord.com/api/webhooks/996836558017663056/D7jAbmNioxVoaXDo2R3215d3zNCYqi_CktkcIcs_vdhejOL0M8eCmsdD92WNa-NZmsp5")
-                ds_channel_players = DiscordEmbed(title = 'Active players', color = 'ff0000', url = 'https://warthunder.com/en/community/claninfo/Ukrainian%20Atamans')
-                ds_channel_players.set_timestamp()
+                webhook_top_players = DiscordWebhook(url = os.environ.get('webhook_channel_players'))
                 ds_top_players = DiscordEmbed(title = 'TOP 20', color = 'ff0000', url = 'https://warthunder.com/en/community/claninfo/Ukrainian%20Atamans')
                 ds_top_players.set_timestamp()
                 db = psycopg2.connect(db_uri, sslmode = 'require')
@@ -112,7 +111,7 @@ Points: {rank}
                 webhook_top_players.execute(remove_embeds=True)
 
 def sq():
-                webhook_squadrons = DiscordWebhook(url = "https://discord.com/api/webhooks/997040903761973288/nH5Sc8mYtonPXMsChH5nyh6Qf-f8cgv6ToVivfx8Y6CSh5VqbpxT0VtKYpV9SesU8olW")
+                webhook_squadrons = DiscordWebhook(url = os.environ.get('webhook_squadrons'))
                 ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')
                 ds_squadrons.set_timestamp()
                 db = psycopg2.connect(db_uri, sslmode = 'require')
@@ -125,6 +124,7 @@ def sq():
                 count_players_change = 0
                 top_int = 0
                 options = webdriver.ChromeOptions()
+                options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
                 options.add_argument("--headless")
                 options.add_argument("--disable-dev-shm-usage")
                 options.add_argument("--no-sandbox")

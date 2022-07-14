@@ -76,7 +76,7 @@ def parsing_of_squadrons():
                 db.commit()
                 
             except: None
-            sql.execute("INSERT INTO squadrons VALUES(?, ?, ?, ?, ?, ?)", (name, top_int, rank, kills, deaths, count_players))
+            sql.execute("INSERT INTO squadrons(name, rank, points, kills, deaths, players) VALUES(%s, %s, %s, %s, %s, %s)", (name, top_int, rank, kills, deaths, count_players))
             db.commit() 
             
             

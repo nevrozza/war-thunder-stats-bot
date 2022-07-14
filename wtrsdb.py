@@ -23,6 +23,7 @@ ds_channel_players = DiscordEmbed(title = 'Active players', color = 'ff0000', ur
 def parsing_of_squadrons():
     webhook_squadrons = DiscordWebhook(url = os.environ['webhook_squadrons'])
     ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')
+    ds_squadrons.set_timestamp()
     db = psycopg2.connect(db_uri, sslmode = 'require')
     sql = db.cursor()
     top_change = 0

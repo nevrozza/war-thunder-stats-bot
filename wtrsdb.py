@@ -12,9 +12,9 @@ sql = db.cursor()
 sort_of_players = {}
 sorted_players = {}
 
-webhook_squadrons = DiscordWebhook(url = os.environ('webhook_squadrons'))
-webhook_channel_players_2 = DiscordWebhook(url = os.environ('webhook_channel_players'))
-webhook_channel_players = DiscordWebhook(url = os.environ('webhook_channel_players'))
+webhook_squadrons = DiscordWebhook(url = os.environ['webhook_squadrons'])
+webhook_channel_players_2 = DiscordWebhook(url = os.environ['webhook_channel_players'])
+webhook_channel_players = DiscordWebhook(url = os.environ['webhook_channel_players'])
 
 ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')
 ds_channel_players_2 = DiscordEmbed(title = 'Active players (2)', color = 'ff0000', url = 'https://warthunder.com/en/community/claninfo/Ukrainian%20Atamans')
@@ -30,7 +30,7 @@ def parsing_of_squadrons():
     top_int = 0
     options = webdriver.ChromeOptions()
     options.headless = True
-    driver =  webdriver.Chrome(executable_path='/app/.chromedriver/bin/chromedriver', options=options)
+    driver =  webdriver.Chrome(executable_path=os.environ['chrome'], options=options)
     driver.get("https://warthunder.com/en/community/clansleaderboard/")
     lnks=driver.find_elements('tag name', "a")
     for lnk in lnks:
@@ -210,7 +210,8 @@ def parsing_of_players():
             discord_players +=1
             if discord_players >= 25:
                 ds_channel_players_2.add_embed_field(name = f'#{top_int} {name}', value = f'**Points**: {rank} (+{rank_player_change})')
-            ds_channel_players.add_embed_field(name = f'#{top_int} {name}', value = f'**Points**: {rank} (+{rank_player_change})')
+            else:    
+                ds_channel_players.add_embed_field(name = f'#{top_int} {name}', value = f'**Points**: {rank} (+{rank_player_change})')
             
         elif rank_player_change < 0:
             discord_players +=1
@@ -228,16 +229,16 @@ Name: {name}
 Points: {rank}
 """)
 
-
-    webhook_channel_players.add_embed(ds_channel_players)
-    webhook_channel_players.execute(remove_embeds=True)
+    if discord_players >= 1:
+        webhook_channel_players.add_embed(ds_channel_players)
+        webhook_channel_players.execute(remove_embeds=True)
     if discord_players >= 25:
         webhook_channel_players_2.add_embed(ds_channel_players_2)
         webhook_channel_players_2.execute(remove_embeds=True)
     
 parsing_of_squadrons()
-schedule.every().day.at('01:21').do(parsing_of_squadrons)    
-schedule.every().day.at('01:21').do(parsing_of_players)
+schedule.every(60).seconds.do(parsing_of_squadrons)    
+schedule.every(50).seconds.do(parsing_of_players)
 while True:
     schedule.run_pending()
     time.sleep(1)   

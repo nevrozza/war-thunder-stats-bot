@@ -71,13 +71,14 @@ def parsing_of_squadrons():
             except: None
             
             ###NEW
-            try:
-                sql.execute(f'DELETE FROM squadrons WHERE name = "{name}" ')
+            try:    
+                sql.execute(f"DELETE FROM squadrons WHERE name = '{name}'")
                 db.commit()
                 
-            except:
+            except Exception as ex: 
+                print(ex)
                 sql.execute('ROLLBACK')
-                db.commit() 
+                db.commit 
             sql.execute("INSERT INTO squadrons(name, rank, points, kills, deaths, players) VALUES(%s, %s, %s, %s, %s, %s)", (name, top_int, rank, kills, deaths, count_players))
             db.commit() 
             

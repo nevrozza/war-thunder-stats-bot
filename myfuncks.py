@@ -269,24 +269,9 @@ Points: {rank}
         webhook_top_players.execute(remove_embeds=True)
         
     if count == 1:
-        for top_int in range(1, count_players+1):
-            a_bs = a_bs.find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling()
-            name_bs = a_bs.find_next_sibling()
-            rank_bs = name_bs.find_next_sibling()
-            
-            name = str(str(name_bs.text).strip())
-            rank = int(str(rank_bs.text).strip())
-            a_bs = bs.find(class_="squadrons-members__grid-item")  
-            while list(sorted_players.keys())[top_int-1] != name:
-                a_bs = a_bs.find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling()
-                name_bs = a_bs.find_next_sibling()
-                rank_bs = name_bs.find_next_sibling()
-                name = str(str(name_bs.text).strip())
-                rank = int(str(rank_bs.text).strip())
-
+        
+        for top_int in range(0, count_players):
             try:
-                sql.execute(f"SELECT rank FROM players WHERE name = '{name}'")
-                top_player_change = int(top_int)  - sql.fetchone()[0]
                 sql.execute(f"SELECT points FROM players WHERE name = '{name}'")
                 rank_player_change = rank  - sql.fetchone()[0]
             except: None
@@ -299,14 +284,8 @@ Points: {rank}
                 print(ex)
                 sql.execute('ROLLBACK')
                 db.commit 
-            sql.execute("INSERT INTO players(name, rank, points) VALUES(%s, %s, %s)", (name, top_int, rank))
+            sql.execute("INSERT INTO players(name, points) VALUES(%s,  %s)", (name, rank))
             db.commit()
-            if top_player_change == 0:
-                top_int = top_int
-            elif top_player_change > 0:
-                name = f'{name} 🔻(-{top_player_change})' 
-            elif top_player_change < 0:
-                name = f'{name} <:small_green_triangle:996827805725753374>(+{abs(top_player_change)})'
             if rank_player_change == 0:
                 pass
             elif rank_player_change > 0:
@@ -314,26 +293,25 @@ Points: {rank}
                 discord_players +=1
                 if discord_players >= 25:
                     
-                    ds_channel_players_2.add_embed_field(name = f'#{top_int} {name}', value = f'**Points**: {rank} <:small_green_triangle:996827805725753374>(+{rank_player_change})')
+                    ds_channel_players_2.add_embed_field(name = f'{name}', value = f'**Points**: {rank} <:small_green_triangle:996827805725753374>(+{rank_player_change})')
                 else:   
                     
-                    ds_channel_players.add_embed_field(name = f'#{top_int} {name}', value = f'**Points**: {rank} <:small_green_triangle:996827805725753374>(+{rank_player_change})')
+                    ds_channel_players.add_embed_field(name = f'{name}', value = f'**Points**: {rank} <:small_green_triangle:996827805725753374>(+{rank_player_change})')
                 
             elif rank_player_change < 0:
                 
                 discord_players +=1
                 if discord_players >= 25:
                     
-                    ds_channel_players_2.add_embed_field(name = f'#{top_int} {name}', value = f'**Points**: {rank} 🔻({rank_player_change})')
+                    ds_channel_players_2.add_embed_field(name = f'{name}', value = f'**Points**: {rank} 🔻({rank_player_change})')
                 else:
                     
-                    ds_channel_players.add_embed_field(name = f'#{top_int} {name}', value = f'**Points**: {rank} 🔻({rank_player_change})')
+                    ds_channel_players.add_embed_field(name = f'{name}', value = f'**Points**: {rank} 🔻({rank_player_change})')
                 
             
                 
             
             print(f"""
-# {top_int}
 Name: {name}
 Points: {rank}
 """)

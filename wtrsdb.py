@@ -31,7 +31,6 @@ def parsing_of_squadrons():
     top_int = 0
     options = webdriver.ChromeOptions()
     
-    options.headless = True
     driver = webdriver.Chrome(executable_path='/app/.chromedriver/bin/chromedriver', options=options)
     driver.get("https://warthunder.com/en/community/clansleaderboard/")
     lnks=driver.find_elements('tag name', "a")

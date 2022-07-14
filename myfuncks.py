@@ -214,7 +214,7 @@ def parsing_of_players(count):
             name = str(str(name_bs.text).strip())
             rank = int(str(rank_bs.text).strip())
             a_bs = bs.find(class_="squadrons-members__grid-item")  
-            while list(sorted_players.keys())[top_int] != name:
+            while list(sorted_players.keys())[top_int-1] != name:
                 a_bs = a_bs.find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling()
                 name_bs = a_bs.find_next_sibling()
                 rank_bs = name_bs.find_next_sibling()
@@ -277,7 +277,7 @@ Points: {rank}
             name = str(str(name_bs.text).strip())
             rank = int(str(rank_bs.text).strip())
             a_bs = bs.find(class_="squadrons-members__grid-item")  
-            while list(sorted_players.keys())[top_int] != name:
+            while list(sorted_players.keys())[top_int-1] != name:
                 a_bs = a_bs.find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling().find_next_sibling()
                 name_bs = a_bs.find_next_sibling()
                 rank_bs = name_bs.find_next_sibling()

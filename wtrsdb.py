@@ -10,31 +10,31 @@ import time
 import os
 
 discord_bot_set = 0
-db_uri = os.environ.get('DATABASE_URL')
+db_uri = os.environ.get['DATABASE_URL']
 db = psycopg2.connect(db_uri, sslmode = 'require')
 sql = db.cursor()
 
 sort_of_players = {}
 sorted_players = {}
 
-# BOT_TOKEN = os.environ.get('BOT_TOKEN')
+# BOT_TOKEN = os.environ.get['BOT_TOKEN']
 BOT_TOKEN = 'OTk2NDAxNTIyNDE2MDM3OTI4.Gk5Pcb.ciVrNhMjWj8hAe0xySRZ7MB22WA9kY9Hw63pVk'
 client = discord.Client()
 
-webhook_channel_players_2 = DiscordWebhook(url = os.environ.get('webhook_channel_players'))
+webhook_channel_players_2 = DiscordWebhook(url = os.environ.get['webhook_channel_players'])
 
 ds_channel_players_2 = DiscordEmbed(title = 'Active players (2)', color = 'ff0000', url = 'https://warthunder.com/en/community/claninfo/Ukrainian%20Atamans')
 
 
 def parsing_of_squadrons(naming):
     if naming == 'start':
-        webhook_squadrons = DiscordWebhook(url = os.environ.get('webhook_squadrons_old'))
+        webhook_squadrons = DiscordWebhook(url = os.environ.get['webhook_squadrons_old'])
         ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons(Initial)', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')
     elif naming == 'last':
-        webhook_squadrons = DiscordWebhook(url = os.environ.get('webhook_squadrons_old'))
+        webhook_squadrons = DiscordWebhook(url = os.environ.get['webhook_squadrons_old'])
         ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons(Ending)', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')    
     elif naming == 'norm':
-        webhook_squadrons = DiscordWebhook(url = os.environ.get('webhook_squadrons'))
+        webhook_squadrons = DiscordWebhook(url = os.environ.get['webhook_squadrons'])
         ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')
     ds_squadrons.set_timestamp()
     db = psycopg2.connect(db_uri, sslmode = 'require')
@@ -50,7 +50,8 @@ def parsing_of_squadrons(naming):
     options.add_argument("--headless")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
-    driver = webdriver.Chrome(executable_path=os.environ.get('CHROMEDRIVER_PATH'), options=options)
+    options.binary_location = os.environ.get["GOOGLE_CHROME_BIN"]
+    driver = webdriver.Chrome(executable_path=os.environ.get['CHROMEDRIVER_PATH'], options=options)
     driver.get("https://warthunder.com/en/community/clansleaderboard/")
     lnks=driver.find_elements('tag name', "a")
     for lnk in lnks:
@@ -183,8 +184,8 @@ Players: {count_players}
     webhook_squadrons.add_embed(ds_squadrons)
     webhook_squadrons.execute(remove_embeds=True)
 def parsing_of_players(count):
-    webhook_channel_players = DiscordWebhook(url = os.environ.get('webhook_channel_players'))
-    webhook_top_players = DiscordWebhook(url = os.environ.get('webhook_channel_players'))
+    webhook_channel_players = DiscordWebhook(url = os.environ.get['webhook_channel_players'])
+    webhook_top_players = DiscordWebhook(url = os.environ.get['webhook_channel_players'])
     ds_channel_players = DiscordEmbed(title = 'Active players', color = 'ff0000', url = 'https://warthunder.com/en/community/claninfo/Ukrainian%20Atamans')
     ds_channel_players.set_timestamp()
     ds_top_players = DiscordEmbed(title = 'TOP 20', color = 'ff0000', url = 'https://warthunder.com/en/community/claninfo/Ukrainian%20Atamans')
@@ -418,7 +419,7 @@ def time_checker():
 schedule.every(30).seconds.do(time_checker) 
 while True:
     
-    if time.strftime('%H:%M:%S', time.gmtime()) == os.environ.get('time_start'):
+    if time.strftime('%H:%M:%S', time.gmtime()) == os.environ.get['time_start']:
         while True:
     
             schedule.run_pending()

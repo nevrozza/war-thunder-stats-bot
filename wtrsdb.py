@@ -22,6 +22,7 @@ ds_channel_players_2 = DiscordEmbed(title = 'Active players (2)', color = 'ff000
 ds_channel_players = DiscordEmbed(title = 'Active players', color = 'ff0000', url = 'https://warthunder.com/en/community/claninfo/Ukrainian%20Atamans')
 
 def parsing_of_squadrons():
+    db = psycopg2.connect(db_uri, sslmode = 'require')
     top_change = 0
     rank_change = 0
     kills_change = 0

@@ -12,15 +12,17 @@ db_uri = 'postgres://vysyajmduuptrm:ec417099e83e35577b8c877f5dbdbb7d2ddafb0d09a7
 sort_of_players = {}
 sorted_players = {}
 
-webhook_squadrons = DiscordWebhook(url = os.environ['webhook_squadrons'])
+
 webhook_channel_players_2 = DiscordWebhook(url = os.environ['webhook_channel_players'])
 webhook_channel_players = DiscordWebhook(url = os.environ['webhook_channel_players'])
 
-ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')
+
 ds_channel_players_2 = DiscordEmbed(title = 'Active players (2)', color = 'ff0000', url = 'https://warthunder.com/en/community/claninfo/Ukrainian%20Atamans')
 ds_channel_players = DiscordEmbed(title = 'Active players', color = 'ff0000', url = 'https://warthunder.com/en/community/claninfo/Ukrainian%20Atamans')
 
 def parsing_of_squadrons():
+    webhook_squadrons = DiscordWebhook(url = os.environ['webhook_squadrons'])
+    ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')
     db = psycopg2.connect(db_uri, sslmode = 'require')
     sql = db.cursor()
     top_change = 0

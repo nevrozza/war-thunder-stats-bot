@@ -241,7 +241,7 @@ Points: {rank}
     
 parsing_of_squadrons()
 schedule.every(60).seconds.do(parsing_of_squadrons)    
-schedule.every(50).seconds.do(parsing_of_players)
+
 while True:
     schedule.run_pending()
     time.sleep(1)   

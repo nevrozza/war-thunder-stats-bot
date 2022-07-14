@@ -416,7 +416,7 @@ def time_checker():
         func_parsing_of_squadrons_ts_last()    
 schedule.every(1).seconds.do(time_checker) 
 while True:
-    time.sleep(1)
+    
     if time.strftime('%H:%M:%S', time.gmtime()) == os.environ.get('time_start'):
         while True:
     

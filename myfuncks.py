@@ -15,12 +15,28 @@ def parsing_of_squadrons(naming):
     if naming == 'start':
         webhook_squadrons = DiscordWebhook(url = os.environ.get('webhook_squadrons_old'))
         ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons(Initial)', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')
+    elif naming == 'start_new_day':
+        webhook_squadrons = DiscordWebhook(url = os.environ.get('webhook_squadrons_old'))
+        ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons(Initial)', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')   
+        webhook_new_day = DiscordWebhook(url = os.environ.get('webhook_squadrons'))
+        ds_new_day = DiscordEmbed(title = '--------------------------------------------------------------------------------------', color = 'ff0000')
+        webhook_new_day.add_embed(ds_new_day)
+        webhook_new_day.execute(remove_embeds=True) 
     elif naming == 'last':
+        webhook_new_day = DiscordWebhook(url = os.environ.get('webhook_squadrons_old'))
+        ds_new_day = DiscordEmbed(title = '--------------------------------------------------------------------------------------', color = 'ff0000')
         webhook_squadrons = DiscordWebhook(url = os.environ.get('webhook_squadrons_old'))
         ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons(Ending)', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')    
     elif naming == 'norm':
         webhook_squadrons = DiscordWebhook(url = os.environ.get('webhook_squadrons'))
         ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')
+    elif naming == 'norm_new_day':
+        webhook_squadrons = DiscordWebhook(url = os.environ.get('webhook_squadrons'))
+        ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')
+        webhook_new_day = DiscordWebhook(url = os.environ.get('webhook_squadrons'))
+        ds_new_day = DiscordEmbed(title = '--------------------------------------------------------------------------------------', color = 'ff0000')
+        webhook_new_day.add_embed(ds_new_day)
+        webhook_new_day.execute(remove_embeds=True)
     ds_squadrons.set_timestamp()
     db = psycopg2.connect(db_uri, sslmode = 'require')
     sql = db.cursor()
@@ -160,7 +176,6 @@ Players: {count_players}
             elif count_players_change < 0:
                 count_players = f'{count_players} 🔻({count_players_change})'
             ds_squadrons.add_embed_field(name = f'#{a} {name}', value = f'**Points**: {rank}\n **Kills**: {kills}\n **Deaths**: {deaths} \n **K\D**: {kd} \n **Members**: {count_players}')
-            
 
 
             
@@ -334,4 +349,12 @@ def func_parsing_of_squadrons_ts_start():
     parsing_of_squadrons_ts.start()    
 def func_parsing_of_squadrons_ts_in_period():
     parsing_of_squadrons_ts = Thread(target = parsing_of_squadrons, args=['norm']) 
+    parsing_of_squadrons_ts.start()
+
+def func_parsing_of_squadrons_ts_in_period_new_day():
+    parsing_of_squadrons_ts = Thread(target = parsing_of_squadrons, args=['norm_new_day']) 
+    parsing_of_squadrons_ts.start()
+
+def func_parsing_of_squadrons_ts_start_new_day():
+    parsing_of_squadrons_ts = Thread(target = parsing_of_squadrons, args=['start_new_day']) 
     parsing_of_squadrons_ts.start()

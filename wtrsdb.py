@@ -380,18 +380,22 @@ def discord_bot():
     async def on_message(message):
         if message.author == client.user:
             return
-        # if message.channel.name == 'управление':
-        # if "<Role id=997106365413720104 name='123'>" in str(message.author.roles):
-        #     if message.content.lower() == '!top':
-        #         await message.channel.send(f'{message.author.mention} wait for top 20 players')
-        #         print(message.author.roles)
-        #         func_parsing_of_top_players_ts()
-        #         return
-        #     if message.content.lower() == '!topsq':
-        #         await message.channel.send(f'{message.author.mention} wait for top 20 squadrons')
-        #         func_parsing_of_squadrons_ts_in_period()
-        #         return
-        
+        if message.channel.name == 'управление':
+            if "<Role id=997106365413720104 name='123'>" in str(message.author.roles):
+                if message.content.lower() == '!top':
+                    await message.delete()
+                    await message.channel.send(f'{message.author.mention} wait for top 20 players in <#996836535645241354>')
+                    print(message.author.roles)
+                    func_parsing_of_top_players_ts()
+                    return
+                if message.content.lower() == '!topsq':
+                    await message.delete()
+                    await message.channel.send(f'{message.author.mention} wait for top 20 squadrons in <#997040874141782046>')
+                    func_parsing_of_squadrons_ts_in_period()
+                    return
+            if message.content.lower() == '!check':
+                await message.delete()
+                await message.channel.send(f'{message.author.mention}: {message.author.roles}')
     client.run(BOT_TOKEN)
 
 def func_discord_bot_ts():

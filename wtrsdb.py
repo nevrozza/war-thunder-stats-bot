@@ -7,8 +7,7 @@ import schedule
 import time
 import os
 db_uri = 'postgres://vysyajmduuptrm:ec417099e83e35577b8c877f5dbdbb7d2ddafb0d09a7cfb2693298331211575b@ec2-63-32-248-14.eu-west-1.compute.amazonaws.com:5432/de53ggptr86e8'
-db = psycopg2.connect(db_uri, sslmode = 'require')
-sql = db.cursor()
+
 
 sort_of_players = {}
 sorted_players = {}
@@ -23,6 +22,7 @@ ds_channel_players = DiscordEmbed(title = 'Active players', color = 'ff0000', ur
 
 def parsing_of_squadrons():
     db = psycopg2.connect(db_uri, sslmode = 'require')
+    sql = db.cursor()
     top_change = 0
     rank_change = 0
     kills_change = 0
@@ -148,6 +148,8 @@ Players: {count_players}
     webhook_squadrons.add_embed(ds_squadrons)
     webhook_squadrons.execute(remove_embeds=True)
 def parsing_of_players():
+    db = psycopg2.connect(db_uri, sslmode = 'require')
+    sql = db.cursor()
     discord_players = 0
     top_player_change = 0
     rank_player_change = 0

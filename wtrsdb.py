@@ -12,9 +12,9 @@ sql = db.cursor()
 sort_of_players = {}
 sorted_players = {}
 
-webhook_squadrons = DiscordWebhook(url = os.environ('webhook_squadrons')'https://discord.com/api/webhooks/996824518171562034/ew7lbPhdtwhHFKrsxonlGnX9pR0rDW-JnDTFKd9lbghnPmDSt0W6zyUkJ4wvkujG0SbH')
-webhook_channel_players_2 = DiscordWebhook(url = os.environ('webhook_channel_players')'https://discord.com/api/webhooks/996836558017663056/D7jAbmNioxVoaXDo2R3215d3zNCYqi_CktkcIcs_vdhejOL0M8eCmsdD92WNa-NZmsp5')
-webhook_channel_players = DiscordWebhook(url = os.environ('webhook_channel_players')'https://discord.com/api/webhooks/996836558017663056/D7jAbmNioxVoaXDo2R3215d3zNCYqi_CktkcIcs_vdhejOL0M8eCmsdD92WNa-NZmsp5')
+webhook_squadrons = DiscordWebhook(url = os.environ('webhook_squadrons'))
+webhook_channel_players_2 = DiscordWebhook(url = os.environ('webhook_channel_players'))
+webhook_channel_players = DiscordWebhook(url = os.environ('webhook_channel_players'))
 
 ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')
 ds_channel_players_2 = DiscordEmbed(title = 'Active players (2)', color = 'ff0000', url = 'https://warthunder.com/en/community/claninfo/Ukrainian%20Atamans')

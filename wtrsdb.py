@@ -417,7 +417,7 @@ def time_checker():
 schedule.every(30).seconds.do(time_checker) 
 while True:
     
-    if time.strftime('%H:%M:%S', time.gmtime()) == '14:31:00':
+    if time.strftime('%H:%M:%S', time.gmtime()) == '14:55:00':
         while True:
     
             schedule.run_pending()

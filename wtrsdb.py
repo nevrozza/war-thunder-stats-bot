@@ -33,7 +33,7 @@ def time_checker():
         fu.func_parsing_of_squadrons_ts_start()
     elif str(str(int(time.strftime('%H', time.gmtime())) * 60 + (int(time.strftime('%M', time.gmtime()))))+ str('+'+time.strftime('%S', time.gmtime()))) in ['440+00', '1340+00']:
         fu.func_parsing_of_squadrons_ts_last()    
-schedule.every(30).seconds.do(time_checker) 
+schedule.every(int(os.environ.get('time_circle'))).seconds.do(time_checker) 
 while True:
     
     if time.strftime('%H:%M:%S', time.gmtime()) == os.environ.get('time_start'):

@@ -31,7 +31,10 @@ def parsing_of_squadrons():
     count_players_change = 0
     top_int = 0
     options = webdriver.ChromeOptions()
-    
+    options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+    options.add_argument("--headless")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--no-sandbox")
     driver = webdriver.Chrome(executable_path='/app/.chromedriver/bin/chromedriver', options=options)
     driver.get("https://warthunder.com/en/community/clansleaderboard/")
     lnks=driver.find_elements('tag name', "a")

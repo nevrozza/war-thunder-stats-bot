@@ -405,12 +405,12 @@ def time_checker():
         discord_bot_set += 1
     func_parsing_of_players_ts()
     print(str(str(int(time.strftime('%H', time.gmtime())) * 60 + (int(time.strftime('%M', time.gmtime()))))+ str('+'+time.strftime('%S', time.gmtime()))))
-    if str(str(int(time.strftime('%H', time.gmtime())) * 60 + (int(time.strftime('%M', time.gmtime()))))+ str('+'+time.strftime('%S', time.gmtime()))) in ['50+0', '80+0', '110+0', '140+0', '170+0', '200+0', '230+0', '260+0', '290+0', '320+0', '350+0', '380+0', '410+0', '830+0', '860+0', '890+0', '920+0', '950+0', '980+0', '1010+0', '1040+0', '1070+0', '1100+0', '1130+0', '1160+0', '1190+0', '1220+0', '1250+0']:
+    if str(str(int(time.strftime('%H', time.gmtime())) * 60 + (int(time.strftime('%M', time.gmtime()))))+ str('+'+time.strftime('%S', time.gmtime()))) in ['80+0', '110+0', '140+0', '170+0', '200+0', '230+0', '260+0', '290+0', '320+0', '350+0', '380+0', '410+0', '860+0', '890+0', '920+0', '950+0', '980+0', '1010+0', '1040+0', '1070+0', '1100+0', '1130+0', '1160+0', '1190+0', '1220+0', '1250+0', '1280+0']:
         func_parsing_of_squadrons_ts_in_period()
-    elif str(str(int(time.strftime('%H', time.gmtime())) * 60 + (int(time.strftime('%M', time.gmtime()))))+ str('+'+time.strftime('%S', time.gmtime()))) in ['830+0',  '1310+0']:
+    elif str(str(int(time.strftime('%H', time.gmtime())) * 60 + (int(time.strftime('%M', time.gmtime()))))+ str('+'+time.strftime('%S', time.gmtime()))) in ['50+0',  '830+0']:
         func_parsing_of_squadrons_ts_start()
     elif str(str(int(time.strftime('%H', time.gmtime())) * 60 + (int(time.strftime('%M', time.gmtime()))))+ str('+'+time.strftime('%S', time.gmtime()))) in ['440+0', '1340+0']:
-        func_parsing_of_squadrons_ts_last()   
+        func_parsing_of_squadrons_ts_last()  
 schedule.every(1).seconds.do(time_checker) 
 while True:
     

@@ -38,11 +38,11 @@ def time_checker():
         fu.func_parsing_of_squadrons_ts_start()
     elif times in ['440+00', '1340+00']:
         fu.func_parsing_of_squadrons_ts_last()    
-schedule.every(int(os.environ.get('time_circle'))).seconds.do(time_checker) 
+ 
 while True:
     print('getto')
     if time.strftime('%H:%M:%S', time.gmtime()) == os.environ.get('time_start'):
         while True:
-            print('check')
-            schedule.run_pending()
-            time.sleep(1) 
+            if time.strftime('%S', time.gmtime()) in ['15', '30', '45', '60']:
+                time_checker()
+            

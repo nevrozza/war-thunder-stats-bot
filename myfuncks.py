@@ -339,7 +339,7 @@ def func_parsing_of_players_ts():
     parsing_of_top_players_ts = Thread(target=parsing_of_players, args=[1])
     parsing_of_top_players_ts.start()  
 def func_parsing_of_squadrons_ts_last():
-    parsing_of_squadrons_ts = Thread(target = parsing_of_squadrons, args = 'last') 
+    parsing_of_squadrons_ts = Thread(target = parsing_of_squadrons, args = ['last']) 
     parsing_of_squadrons_ts.start()
 def func_parsing_of_squadrons_ts_start():
     parsing_of_squadrons_ts = Thread(target = parsing_of_squadrons, args=['start']) 

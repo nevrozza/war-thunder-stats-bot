@@ -40,9 +40,9 @@ def time_checker():
         fu.func_parsing_of_squadrons_ts_last()    
  
 while True:
-    print('getto')
     if time.strftime('%H:%M:%S', time.gmtime()) == os.environ.get('time_start'):
         while True:
-            if time.strftime('%S', time.gmtime()) in ['15', '30', '45', '60']:
+            if time.strftime('%S', time.gmtime()) in ['00', '15', '30', '45', '60']:
                 time_checker()
+                time.sleep(os.environ.get('time_circle'))
             

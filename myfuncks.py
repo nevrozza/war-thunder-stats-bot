@@ -321,10 +321,7 @@ Points: {rank}
             
                 
             
-            print(f"""
-Name: {name}
-Points: {rank}
-""")
+           
 
         if discord_players >= 1:
             webhook_channel_players.add_embed(ds_channel_players)

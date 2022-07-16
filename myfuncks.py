@@ -100,7 +100,7 @@ def parsing_of_squadrons(naming):
             
             ###NEW
             try:
-                if naming == 'start':
+                if naming == 'start' or naming == 'start_new_day':
                     sql.execute(f"DELETE FROM period_squadrons WHERE name = '{name}'")
                     db.commit()
                 else:
@@ -111,7 +111,7 @@ def parsing_of_squadrons(naming):
                 print(ex)
                 sql.execute('ROLLBACK')
                 db.commit
-            if naming == 'start':
+            if naming == 'start' or naming == 'start_new_day':
                 sql.execute("INSERT INTO period_squadrons(name, rank, points, kills, deaths, players) VALUES(%s, %s, %s, %s, %s, %s)", (name, top_int, rank, kills, deaths, count_players))
                 db.commit() 
             else:

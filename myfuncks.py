@@ -18,13 +18,11 @@ def parsing_of_squadrons(naming):
     elif naming == 'start_new_day':
         webhook_squadrons = DiscordWebhook(url = os.environ.get('webhook_squadrons_old'))
         ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons(Initial)', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')   
-        webhook_new_day = DiscordWebhook(url = os.environ.get('webhook_squadrons'))
+        webhook_new_day = DiscordWebhook(url = os.environ.get('webhook_squadrons_old'))
         ds_new_day = DiscordEmbed(title = '--------------------------------------------------------------------------------------', color = 'ff0000')
         webhook_new_day.add_embed(ds_new_day)
         webhook_new_day.execute(remove_embeds=True) 
     elif naming == 'last':
-        webhook_new_day = DiscordWebhook(url = os.environ.get('webhook_squadrons_old'))
-        ds_new_day = DiscordEmbed(title = '--------------------------------------------------------------------------------------', color = 'ff0000')
         webhook_squadrons = DiscordWebhook(url = os.environ.get('webhook_squadrons_old'))
         ds_squadrons = DiscordEmbed(title = 'Leaderboard of squadrons(Ending)', color = 'ff0000', url = 'https://warthunder.com/en/community/clansleaderboard')    
     elif naming == 'norm':

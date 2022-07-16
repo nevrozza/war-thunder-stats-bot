@@ -34,7 +34,7 @@ def time_checker():
     elif times == '80+00':
         fu.func_parsing_of_squadrons_ts_in_period_new_day()  
     elif times == '50+00':
-        fu.func_parsing_of_squadrons_ts_in_period_new_day()    
+        fu.func_parsing_of_squadrons_ts_start_new_day()   
     elif times == '830+00':
         fu.func_parsing_of_squadrons_ts_start()
     elif times in ['440+00', '1340+00']:
